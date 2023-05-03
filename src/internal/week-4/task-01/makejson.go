@@ -8,24 +8,19 @@ import (
 func main() {
 	inputData := make(map[string]string)
 
-	fmt.Println("Enter your name:")
-
+	fmt.Print("Enter your name: ")
 	var name string
 	mustScan(&name)
 	inputData["name"] = name
 
-	fmt.Println("Enter your Address:")
-
+	fmt.Print("Enter your Address: ")
 	var address string
 	mustScan(&address)
 	inputData["address"] = address
 
-	inputDataJson, err := json.Marshal(&inputData)
-	if err != nil {
-		panic(err)
-	}
+	inputDataJson := mustMarshal(inputData)
 
-	fmt.Printf("JSON envoded input data: %s\n", inputDataJson)
+	fmt.Printf("JSON encoded input data: %s\n", inputDataJson)
 }
 
 func mustScan(a ...any) (n int) {
@@ -34,4 +29,12 @@ func mustScan(a ...any) (n int) {
 		panic(err)
 	}
 	return n
+}
+
+func mustMarshal(v any) []byte {
+	inputDataJson, err := json.Marshal(&v)
+	if err != nil {
+		panic(err)
+	}
+	return inputDataJson
 }
