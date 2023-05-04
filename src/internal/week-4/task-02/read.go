@@ -7,72 +7,45 @@ import (
 	"strings"
 )
 
-type person struct {
-	fname string
-	lname string
-}
-
-func (p person) String() string {
-	return fmt.Sprintf(`
-		first name:			%s
-		last name:			%s`, p.fname, p.lname)
-}
-
 func main() {
-	filePath := requestFilePath()
 
-	file := mustOpen(filePath)
-	defer file.Close()
+	var fileName string
+	//var err error
 
-	persons := scanPersonsFromFile(file)
+	//fileName = "/home/juaneco/jcfr/desarrollo/go/input.txt"
 
-	printSummary(persons)
-}
+	fmt.Printf("\nEnter a file name: ")
+	_, _ = fmt.Scan(&fileName)
 
-func requestFilePath() string {
-	fmt.Print("enter a path to a file to parse:")
+	file, _ := os.Open(fileName)
 
-	var filePath string
-	_, err := fmt.Scan(&filePath)
-	if err != nil {
-		panic(err)
-	}
-
-	return filePath
-}
-
-func mustOpen(filePath string) *os.File {
-	file, err := os.Open(filePath)
-	if err != nil {
-		panic(err)
-	}
-
-	return file
-}
-
-func scanPersonsFromFile(file *os.File) []person {
 	scanner := bufio.NewScanner(file)
 
-	persons := []person{}
-	for scanner.Scan() {
-		lineText := scanner.Text()
-		lineSplit := strings.Split(lineText, " ")
-		if len(lineSplit) != 2 {
-			panic(fmt.Sprintf("Can not parse line '%v'", lineText))
-		}
+	var persons = make([]PersonStruct, 0)
 
-		persons = append(persons, person{
+	for scanner.Scan() {
+
+		line := scanner.Text()
+		lineSplit := strings.Split(line, " ")
+
+		// creating a new person
+		person := PersonStruct{
 			fname: lineSplit[0],
 			lname: lineSplit[1],
-		})
+		}
+
+		// append person to the slice persons
+		persons = append(persons, person)
 	}
 
-	return persons
+	_ = file.Close()
+
+	for _, person := range persons {
+		fmt.Printf("%s %s\n", person.fname, person.lname)
+	}
 }
 
-func printSummary(persons []person) {
-	fmt.Printf("Found %v persons:", len(persons))
-	for _, person := range persons {
-		fmt.Println(person)
-	}
+type PersonStruct struct {
+	fname string
+	lname string
 }
