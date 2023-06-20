@@ -18,9 +18,10 @@ func main() {
 
 	ints := getIntsFromUserInput()
 
-	sortGroupCount := int(math.Ceil(float64(len(ints)) / 4))
+	sortGroupCount := 4
+	sortGroupMaxSize := int(math.Ceil(float64(len(ints)) / float64(sortGroupCount)))
 
-	sortedGroups := concurrentSort(sortGroupCount, ints)
+	sortedGroups := concurrentSort(sortGroupCount, sortGroupMaxSize, ints)
 	sortedInts := appendIntGroups(ints, sortGroupCount, sortedGroups)
 	sortFinalList(sortedInts)
 
@@ -47,15 +48,15 @@ func getIntsFromUserInput() []int {
 	return ints
 }
 
-func concurrentSort(sortGroupCount int, ints []int) [][]int {
+func concurrentSort(sortGroupCount int, groupMaxSize int, ints []int) [][]int {
 	sortGroups := make([][]int, 0, sortGroupCount)
 	var wg sync.WaitGroup
 
 	for i := 0; i < sortGroupCount; i++ {
 		wg.Add(1)
 
-		sortGroupSliceStart := i * 4
-		sortGroupSliceEnd := i*4 + 4
+		sortGroupSliceStart := i * groupMaxSize
+		sortGroupSliceEnd := i*groupMaxSize + groupMaxSize
 
 		if sortGroupSliceEnd > len(ints) {
 			sortGroupSliceEnd = len(ints)
